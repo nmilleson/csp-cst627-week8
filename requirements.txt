@@ -1,0 +1,16 @@
+# Pinned for Python 3.11-3.12. torch is intentionally NOT pinned: Colab's preinstalled CUDA build
+# is used as-is (reinstalling torch on Colab risks a CUDA/driver mismatch). The exact torch, CUDA
+# and driver versions are written into every row of results/runs.csv and results/environment.json,
+# and the full `pip freeze` of the reference session is in results/pip_freeze.txt.
+transformers==5.21.0
+tokenizers==0.23.3
+huggingface_hub==2.3.0
+safetensors==0.8.0
+peft==0.21.2
+bitsandbytes==0.50.2
+accelerate==1.15.0
+scikit-learn==1.9.1
+scipy==1.17.1
+numpy==2.4.6
+pandas==3.1.0
+matplotlib==3.11.2

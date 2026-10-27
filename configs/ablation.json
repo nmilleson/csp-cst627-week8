@@ -1,0 +1,41 @@
+{
+  "model_id": "Qwen/Qwen2.5-0.5B",
+  "model_revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+
+  "dataset": {
+    "name": "Banking77",
+    "license": "CC-BY-4.0",
+    "base_url": "https://raw.githubusercontent.com/PolyAI-LDN/task-specific-datasets/57ec275d8078af65b7731c2a98be812d844a6d6b/banking_data/",
+    "files": {
+      "train": {"path": "train.csv", "sha256": "b06e26ac675513959a63135f11b94ea7786ed02da65db93a5650d8838cbc664b"},
+      "test":  {"path": "test.csv",  "sha256": "d12d6e3bc4c3103966ae786dc435913c0c563dfa328f5a3646d0e62cfeeb474d"}
+    }
+  },
+  "split_seed": 1234,
+  "val_fraction": 0.1,
+
+  "max_length": 128,
+  "batch_size": 32,
+  "eval_batch_size": 64,
+  "epochs": 3,
+  "lr": 2e-4,
+  "warmup_ratio": 0.06,
+  "weight_decay": 0.0,
+  "max_grad_norm": 1.0,
+  "log_every": 20,
+
+  "lora_alpha_multiplier": 2,
+  "lora_dropout": 0.05,
+  "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+
+  "grid": {
+    "seed": [0, 1, 2],
+    "precision": ["fp16", "nf4"],
+    "rank": [4, 8, 16, 32]
+  },
+
+  "latency": {"n_queries": 200, "warmup": 20},
+  "near_duplicate_cosine": 0.9,
+
+  "smoke": {"n_train": 256, "n_val": 128, "n_test": 256, "epochs": 1}
+}
