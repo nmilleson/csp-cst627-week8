@@ -33,7 +33,8 @@
 
 ```bash
 git clone <this-repo-url> && cd <repo>
-pip install -r requirements.txt   # Python 3.11 or 3.12
+pip install -r requirements.txt   # Python 3.11-3.13
+pip uninstall -y torchao          # only needed if torchao < 0.16 is present (Colab ships 0.10)
 python scripts/make_figures.py    # writes figures/*.png and results/summary.md
 ```
 

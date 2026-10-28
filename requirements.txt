@@ -1,4 +1,6 @@
-# Pinned for Python 3.11-3.12. torch is intentionally NOT pinned: Colab's preinstalled CUDA build
+# Pinned for Python 3.11-3.13. If torchao < 0.16 is installed (Colab ships 0.10), uninstall it:
+# peft 0.21 rejects old torchao on import and this project does not use it.
+# torch is intentionally NOT pinned: Colab's preinstalled CUDA build
 # is used as-is (reinstalling torch on Colab risks a CUDA/driver mismatch). The exact torch, CUDA
 # and driver versions are written into every row of results/runs.csv and results/environment.json,
 # and the full `pip freeze` of the reference session is in results/pip_freeze.txt.
