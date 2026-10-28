@@ -156,9 +156,10 @@ def markdown_table(agg, baseline, audit, note):
         lines.append(f"| TF-IDF + LogReg (CPU) | – | 1 | {100 * baseline['test_acc']:.2f} "
                      f"| {100 * baseline['test_macro_f1']:.2f} | – | – | {baseline['fit_seconds_cpu'] / 60:.1f} (CPU) | – | – | – |")
     se = 100 * agg["test_se"].max() if not agg.empty else float("nan")
-    lines += ["", f"Values are mean ± 1 sample SD across seeds. Test-set sampling error alone is about "
-                  f"±{se:.2f} pp (binomial SE, n = {int(agg['n_test'].iloc[0])}), so differences "
-                  "smaller than roughly 2 × that are not resolvable on this test set.",
+    lines += ["", f"Values are mean ± 1 sample SD across seeds. Test-set sampling error of a single "
+                  f"accuracy is about ±{se:.2f} pp (binomial SE, n = {int(agg['n_test'].iloc[0])}). "
+                  "Configurations share the same test items, so differences between them are judged with "
+                  "the paired bootstrap in results/audit/paired_differences.csv.",
               f"Hardware and software: {note.split(' | error')[0]}."]
     if audit:
         lines.append(f"Train/test overlap: {audit['exact_duplicates_in_train']} exact and "
@@ -185,8 +186,10 @@ def main():
 
     agg = summarise(runs)
     note = hardware_note(runs)
-    agg.round(5).to_csv(results_dir / "summary.csv", index=False)
-    (results_dir / "summary.md").write_text(markdown_table(agg, baseline, audit, note), encoding="utf-8")
+    # LF everywhere so a regeneration on Windows is byte-identical to the committed files
+    agg.round(5).to_csv(results_dir / "summary.csv", index=False, lineterminator="\n")
+    (results_dir / "summary.md").write_text(markdown_table(agg, baseline, audit, note),
+                                            encoding="utf-8", newline="\n")
 
     fig_accuracy(agg, runs, baseline, note, figures_dir / "fig1_accuracy_vs_rank.png")
     fig_memory(agg, note, figures_dir / "fig2_accuracy_vs_memory.png")

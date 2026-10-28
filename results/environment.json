@@ -1,0 +1,22 @@
+{
+  "python": "3.13.16",
+  "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+  "colab": true,
+  "git_commit": "b48fb21",
+  "git_dirty": false,
+  "cuda_runtime": "13.0",
+  "cudnn": "92700",
+  "gpu_name": "Tesla T4",
+  "gpu_mem_total_mb": 14913,
+  "gpu_capability": "7.5",
+  "driver": "580.82.07",
+  "torch": "2.11.0+cu130",
+  "transformers": "5.21.0",
+  "peft": "0.21.2",
+  "bitsandbytes": "0.50.2",
+  "accelerate": "1.15.0",
+  "scikit-learn": "1.9.1",
+  "numpy": "2.4.6",
+  "pandas": "3.1.0",
+  "matplotlib": "3.11.2"
+}

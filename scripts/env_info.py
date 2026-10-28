@@ -62,7 +62,7 @@ def main():
     out = os.path.abspath(args.results_dir)
     os.makedirs(out, exist_ok=True)
     info = collect()
-    with open(os.path.join(out, "environment.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(out, "environment.json"), "w", encoding="utf-8", newline="\n") as f:
         json.dump(info, f, indent=2)
     freeze = subprocess.run([sys.executable, "-m", "pip", "freeze"], capture_output=True, text=True).stdout
     with open(os.path.join(out, "pip_freeze.txt"), "w", encoding="utf-8") as f:

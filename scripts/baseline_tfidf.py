@@ -54,7 +54,7 @@ def main():
         "n_train": x_train.shape[0],
         "n_test": len(test_y),
     }
-    with open(results_dir / "baseline.json", "w", encoding="utf-8") as f:
+    with open(results_dir / "baseline.json", "w", encoding="utf-8", newline="\n") as f:
         json.dump(result, f, indent=2)
     with open(results_dir / "predictions" / "tfidf_logreg.csv", "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)

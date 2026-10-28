@@ -256,7 +256,7 @@ def main():
         writer = csv.writer(f)
         writer.writerow(["idx", "label", "pred"])
         writer.writerows(zip(range(len(test_y)), test_y, test_pred))
-    with open(results_dir / "curves" / f"{rid}.json", "w", encoding="utf-8") as f:
+    with open(results_dir / "curves" / f"{rid}.json", "w", encoding="utf-8", newline="\n") as f:
         json.dump(curve, f)
 
     env = collect_env()

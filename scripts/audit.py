@@ -63,6 +63,40 @@ def accuracy(preds, labels, idx):
     return float(np.mean([preds[i] == labels[i] for i in idx])) if idx else float("nan")
 
 
+def contrasts(keys):
+    """The comparisons the README makes claims about, as (a, b) pairs meaning 'a minus b'."""
+    pairs = []
+    for prec in ("fp16", "nf4"):
+        pairs += [(f"{prec}_r{hi}", f"{prec}_r4") for hi in (8, 16, 32)]
+    for rank in (4, 8, 16, 32):
+        pairs.append((f"nf4_r{rank}", f"fp16_r{rank}"))
+    pairs += [(k, "tfidf_logreg") for k in ("fp16_r4", "nf4_r4")]
+    return [(a, b) for a, b in pairs if a in keys and b in keys]
+
+
+def paired_bootstrap(models, labels, n_boot=10_000, seed=0):
+    """Paired difference in accuracy between configurations on the *same* test items.
+
+    Each item's correctness is first averaged over seeds, then items are resampled with
+    replacement. The CI therefore reflects test-set sampling only; seed spread is reported
+    separately as the SD in summary.md.
+    """
+    common = sorted(set.intersection(*(set(p) for runs in models.values() for _, p in runs)))
+    y = np.array([labels[i] for i in common])
+    correct = {k: np.mean([np.array([p[i] for i in common]) == y for _, p in runs], axis=0)
+               for k, runs in models.items()}
+    rng = np.random.default_rng(seed)
+    boot_idx = rng.integers(0, len(common), size=(n_boot, len(common)), dtype=np.int32)
+    rows = []
+    for a, b in contrasts(correct):
+        d = correct[a] - correct[b]
+        boots = np.concatenate([d[chunk].mean(axis=1) for chunk in np.array_split(boot_idx, 10)])
+        lo, hi = np.percentile(boots, [2.5, 97.5])
+        rows.append({"a": a, "b": b, "diff_pp": round(100 * d.mean(), 3), "ci95_low_pp": round(100 * lo, 3),
+                     "ci95_high_pp": round(100 * hi, 3), "excludes_zero": bool(lo > 0 or hi < 0)})
+    return rows
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--results-dir", default=str(ROOT / "results"))
@@ -84,8 +118,9 @@ def main():
     clean_idx = [r["idx"] for r in overlap_rows if not r["near_dup"]]
 
     bucket_of = [length_bucket(t) for t in test_text]
+    models = load_predictions(results_dir / "predictions")
     slice_rows, class_rows, overlap_summary = [], [], {}
-    for key, runs in load_predictions(results_dir / "predictions").items():
+    for key, runs in models.items():
         all_acc = [accuracy(p, labels, range(len(labels))) for _, p in runs]
         clean_acc = [accuracy(p, labels, clean_idx) for _, p in runs]
         dup_acc = [accuracy(p, labels, dup_idx) for _, p in runs]
@@ -101,7 +136,11 @@ def main():
             class_rows.append({"model": key, "intent": name, "n": len(idx),
                                "acc_mean": round(float(np.mean([accuracy(p, labels, idx) for _, p in runs])), 4)})
 
-    for path, rows in ((out / "slices.csv", slice_rows), (out / "per_class.csv", class_rows)):
+    paired_rows = paired_bootstrap(models, labels)
+    for path, rows in ((out / "slices.csv", slice_rows), (out / "per_class.csv", class_rows),
+                       (out / "paired_differences.csv", paired_rows)):
+        if not rows:
+            continue
         with open(path, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=list(rows[0]))
             writer.writeheader()
@@ -118,8 +157,9 @@ def main():
         "accuracy_by_overlap": overlap_summary,
         "best_lora_config": best,
         "best_config_worst_intents": worst,
+        "paired_differences": paired_rows,
     }
-    with open(out / "summary.json", "w", encoding="utf-8") as f:
+    with open(out / "summary.json", "w", encoding="utf-8", newline="\n") as f:
         json.dump(summary, f, indent=2)
     print(json.dumps(summary, indent=2))
 

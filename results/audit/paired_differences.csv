@@ -1,0 +1,13 @@
+a,b,diff_pp,ci95_low_pp,ci95_high_pp,excludes_zero
+fp16_r8,fp16_r4,0.119,-0.13,0.379,False
+fp16_r16,fp16_r4,0.357,0.054,0.671,True
+fp16_r32,fp16_r4,0.335,-0.076,0.747,False
+nf4_r8,nf4_r4,0.184,-0.065,0.444,False
+nf4_r16,nf4_r4,0.206,-0.13,0.541,False
+nf4_r32,nf4_r4,0.498,0.097,0.898,True
+nf4_r4,fp16_r4,0.032,-0.271,0.357,False
+nf4_r8,fp16_r8,0.097,-0.216,0.411,False
+nf4_r16,fp16_r16,-0.119,-0.411,0.163,False
+nf4_r32,fp16_r32,0.195,-0.141,0.53,False
+fp16_r4,tfidf_logreg,4.903,3.939,5.877,True
+nf4_r4,tfidf_logreg,4.935,3.994,5.887,True
